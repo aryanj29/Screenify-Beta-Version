@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Screenify</title>
+    <link href="style/picker/standalone.min.css" rel="stylesheet" />
+    <link href="style/picker/clockpicker.min.css" rel="stylesheet" />
+    <link href="style/settings.css" rel="stylesheet" />
+    <script src="scripts/common.js"></script>
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/settings.js"></script>
+    <script src="scripts/restriction.js"></script>
+    <script src="scripts/picker/jquery-3.3.1.min.js"></script>
+    <script src="scripts/picker/clockpicker.min.js"></script>
+</head>
+
+<body>
+    <div class="content">
+        <div class="header">
+            <p class="title">Screenify</p>
+        </div>
+        <div id='nav' class="nav">
+            <a id='settingsBtn' class="active">Settings</a>
+            <a id='restrictionsBtn'> Set Limits</a>
+            <a id='notifyBtn'>Notifications</a>
+            <a id='aboutBtn'>About</a>
+            <a id='donateBtn'>More about Screenify</a>
+        </div>
+        <div id='block'>
+            <div id='settingsBlock'>
+                <label>
+                    <input type="checkbox" class="filled-in" id="viewTimeInBadge" />
+                    <span>Display time tracker in icon</span>
+                </label>
+                <div class="margin-top-10">
+                    <label>
+                        <input type="checkbox" class="filled-in" id="blockDeferral" />   
+                        <span>Allow deferring block for 5 minutes</span>
+                    </label>
+                </div>
+                <div class="margin-top-10">
+                    <label>
+                        <input type="checkbox" class="filled-in" id="darkMode" />   
+                        <span>Dark mode</span>
+                    </label>
+                </div>
+                <div class="margin-top-10">
+                    <label>Stop tracking if no activity detected for: </label>
+                    <div class="tooltip"><img src="/icons/information.svg" height="18" />
+                        <span class="tooltiptext">An activity is an action with a mouse or keyboard</span>
+                    </div>
+                    <div class="margin-top-10">
+                        <select id='intervalInactivity' class="option">
+                            <option value="30">30 seconds</option>
+                            <option value="45">45 seconds</option>
+                            <option value="60">1 min</option>
+                            <option value="120">2 min</option>
+                            <option value="300">5 mins</option>
+                            <option value="600">10 mins</option>
+                            <option value="1200">20 mins</option>
+                            <option value="1800">30 mins</option>
+                        </select>
+                    </div>
+                    <div class="margin-top-10"><label>Default range for days:</label></div>
+                    <div class="margin-top-10">
+                        <select id='rangeToDays' class="option">
+                            <option value="days2">2 days</option>
+                            <option value="days3">3 days</option>
+                            <option value="days4">4 days</option>
+                            <option value="days5">5 days</option>
+                            <option value="days6">6 days</option>
+                            <option value="days7">7 days</option>
+                            <option value="month1">1 month</option>
+                            <option value="month2">2 months</option>
+                            <option value="month3">3 months</option>
+                        </select>
+                    </div>
+                    <div class="margin-top-10">
+                        <label>Ignored list of Domains: </label>
+                        <div class="tooltip"><img src="/icons/information.svg" height="18" />
+                            <span class="tooltiptext">Activity for these domains will not be tracked</span>
+                        </div>
+                        <div class="margin-top-10">
+                            <ul id='blackList' class="listbox" size="7"></ul>
+                        </div>
+                        <div class="margin-top-10">
+                            <input type="text" placeholder="Enter site name..." id='addBlackSiteLbl' />
+                            <input type="button" value="+" id='addBlackSiteBtn' />
+                        </div>
+                        <div class="notify warning" id='notifyForBlackList' hidden>
+                            The site is already in the list
+                        </div>
+                    </div>
+                    <div class="margin-top-10">
+                        <input type="button" value="Export to CSV" id='exportToCsv'>
+                    </div>
+                    <div class="margin-top-10">
+                        <input type="button" value="Backup" id='backup'>
+                        <input type="button" value="Restore" id='restore'>
+                        <input id="file-input-backup" class="hidden" type="file" name="backupFile" />
+                    </div>
+                    <div class="notify" id='notify-backup' hidden>
+                        Backup completed successfully
+                    </div>
+                    <div class="notify" id='notify-restore' hidden>
+                        Restore completed successfully
+                    </div>
+                    <div class="notify warning" id='notify-restore-failed' hidden>
+                        Backup file is not valid
+                    </div>
+                    <!-- YouTube -->
+                    <div class="margin-top-10">
+                        <label class="block">Screenify tracks your activity when you're active in
+                            the browser with your mouse or keyboard.
+                            In order for the extension to also track when you watch <span class="bold">a video on
+                                YouTube / Netflix</span>, you need grant it
+                            permission to access these sites.
+                            The extension needs permission to access to the DOM (Document Object Model) to tell if a video is currently playing.</label>
+                    </div>
+                    <div class="margin-top-10">
+                        <label class="bold site-name">YouTube</label>
+                        <input class="margin-top-10 permission-btn" type="button" value="Grant permission"
+                            id='grantPermissionForYT'>
+                        <div id='permissionSuccessedBlockForYT' hidden>
+                            <img src="/icons/success.png" height="18" />
+                            <label>Permissions have been granted</label>
+                        </div>
+                    </div>
+                    <!-- Netflix -->
+                    <div class="margin-top-10">
+                        <label class="bold site-name">Netflix</label>
+                        <input class="margin-top-10 permission-btn" type="button" value="Grant permission"
+                            id='grantPermissionForNetflix'>
+                        <div id='permissionSuccessedBlockForNetflix' hidden>
+                            <img src="/icons/success.png" height="18" />
+                            <label>Permissions have been granted</label>
+                        </div>
+                    </div>
+                    <div class="margin-top-10">
+                        <label>Data in memory use </label><label id='memoryUse'></label>
+                    </div>
+                    <div class="margin-top-10"><input type="button" value="Clear all data" id='clearAllData'></div>
+                    <div class="notify" id='notify' hidden>
+                        Data successfully deleted
+                    </div>
+                </div>
+            </div>
+            <div id='restrictionsBlock' hidden>
+                <label>Access daily restrictions for websites: </label>
+                <div class="tooltip"><img src="/icons/information.svg" height="18" />
+                    <span class="tooltiptext">Set the maximum time allowed on the site per day. Once the set time has elapsed the site will be blocked.</span>
+                </div>
+                <div class="margin-top-10">
+                    <input type="text" class="label-with-list" placeholder="Enter site name..."
+                        id='addRestrictionSiteLbl' />
+                    <div class="inline-block clockpicker" data-placement="left" data-align="top" data-autoclose="true">
+                        <input type="text" class="clock" placeholder="Time..." readonly id="addRestrictionTimeLbl">
+                    </div>
+                    <input type="button" value="+" class="btn-with-list" id='addRestrictionSiteBtn' />
+                </div>
+                <div class="margin-top-10">
+                    <ul id='restrictionsList' class="listbox list" size="10"></ul>
+                </div>
+                <div class="notify warning notify-width-300" id='notifyForRestrictionList' hidden>
+                    The site is already in the list
+                </div>
+            </div>
+            <div id='notifyBlock' hidden>
+                <label>List of sites with notifications: </label>
+                <div class="tooltip"><img src="/icons/information.svg" height="18" />
+                    <span class="tooltiptext">Show notifications every time you spend a specified time interval on the
+                        site</span>
+                </div>
+                <div class="margin-top-10">
+                    <input type="text" class="label-with-list" placeholder="Enter site name..." id='addNotifySiteLbl' />
+                    <div class="inline-block clockpicker" data-placement="left" data-align="top" data-autoclose="true">
+                        <input type="text" class="clock" placeholder="Time..." readonly id="addNotifyTimeLbl">
+                    </div>
+                    <input type="button" class="btn-with-list" value="+" id='addNotifySiteBtn' />
+                </div>
+                <div class="margin-top-10">
+                    <ul id='notifyList' class="listbox list" size="10"></ul>
+                </div>
+                <div class="margin-top-10">
+                    <label>You can set message for notification: </label>
+                    <div class="setting-notify-block">
+                        <img src="icons/Screenifylogo128.png" class="setting-notify-img">
+                        <div class="setting-notify-message-block">
+                            <span class="setting-notify-title">Screenify</span>
+                            <input type="text" class="setting-notify-message" id="notifyMessage" />
+                        </div>
+                    </div>
+                </div>
+                <div class="margin-top-10">
+                    <label class="block">In order for Screenify to show notifications every time you cross
+                        a specified time interval on the site, you need to grant permission to access for notifications.
+                    </label>
+                    <input class="margin-top-10 permission-btn" type="button" value="Grant permission"
+                        id='grantPermissionForNotifications'>
+                    <div id='permissionSuccessedBlockForNotifications' hidden>
+                        <img src="/icons/success.png" height="18" />
+                        <label>Permissions have been granted!</label>
+                    </div>
+                </div>
+                <div class="notify warning notify-width-300" id='notifyForNotifyList' hidden>
+                    The site is already in the notify list
+                </div>
+            </div>
+            <div id='aboutBlock' hidden>
+                <!--<div><label id='version'></label></div>-->
+                <div><label>PRESENTING YOU WITH beta version of SCREENIFY !</label></div>
+                <div class="margin-top-20"><label>We present to you with one of a kind Screen Activity Monitor. An extension which keeps a tab on your web-activity during your computer usage hours. 
+                    It tracks the applications you use, checks the category of the application, amount of time used and so on. It is a background application which performs its operations automatically.
+                    Good feedback of our activity throughout the day would help us in shaping our priorities and reduce unwanted usage with ease.
+                    </label>
+                </div>
+                <div class="margin-top-20"><label>GitHub Repository: <a
+                            href="https://github.com/aryanj29/Screenify"
+                            target="_blank">https://github.com/aryanj29/Screenify</a></label>
+                </div>
+                <!--<div class="margin-top-20"><label>If you have feedback or would like to report an issue, you can do so
+                        on
+                        the <a href="https://github.com/aryanj29/Screenify"
+                            target="_blank">GitHub
+                            issues page</a></label>
+                </div>-->
+    
+                <!--<div class="margin-top-20">
+                    <label>Do you enjoy using Screenify? <a
+                            href="https://twitter.com/AJ_tweet1/status/1461990024514183169?s=20"
+                            target="_blank">Let us know!</a></label>
+                </div>-->
+            </div>
+            <div id='donateBlock' hidden>
+                <div>
+                    <label>You can Read about Screenify. Click the icon below. Do like and share the blog!</label>
+                    <div class="margin-top-20">
+                        <div class="inline-block">
+                            <a class="bmc-button" target="_blank" href="https://aryanjindal20.medium.com/screenify-a-tap-to-unlock-your-life-7cd050cefe1e"><img
+                                    src="/icons/bmc-new-btn-logo.svg" alt="Click Here!"><span>Click Here!</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

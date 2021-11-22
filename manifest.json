@@ -1,0 +1,49 @@
+{
+        "manifest_version": 2,
+    
+        "name": "Screenify Beta",
+        "short_name": "Screenify",
+        "version": "0",
+        "minimum_chrome_version": "26",
+
+        "description": "Track and limit time your activity in the browser every day.",
+
+        "options_page": "options.html",
+    
+        "icons": {
+            "16": "icons/Screenifylogo16.png",
+            "32": "icons/Screenifylogo32.png",
+            "48": "icons/Screenifylogo48.png",
+            "128": "icons/Screenifylogo128.png"
+        },
+        "permissions": [
+            "tabs",
+            "activeTab",
+            "storage",
+            "idle",
+            "chrome://favicon/*",
+            "webNavigation",
+            "unlimitedStorage"
+        ],
+        "optional_permissions": [
+            "https://www.youtube.com/*",
+            "https://www.netflix.com/*",
+            "notifications"
+          ],
+        "offline_enabled": true,
+        "background": {
+            "scripts": ["scripts/common.js", 
+                        "scripts/storage.js", 
+                        "scripts/activity.js", 
+                        "scripts/tab.js", 
+                        "scripts/timeInterval.js",
+                        "scripts/background.js",
+                        "scripts/restriction.js"],
+            "persistent": false
+        },
+        "browser_action": {
+            "default_popup": "index.html",
+            "default_title": "Screenify",
+            "default_icon": "icons/Screenifylogo48.png"
+        }
+}
